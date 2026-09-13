@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0f2027">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PIN MEBUC">
+<title>PIN MEBUC — RIPOL 5</title>
+<script>
+/* ── Manifest PWA inline (no requiere archivo externo) ── */
+(function(){
+  var m={
+    name:"PIN MEBUC — RIPOL 5",short_name:"PIN MEBUC",
+    description:"Generador de PIN institucionales RIPOL 5 - MEBUC",
+    start_url:"./PIN_MEBUC.html",display:"standalone",
+    background_color:"#0f2027",theme_color:"#0f2027",orientation:"portrait",
+    icons:[
+      {src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='80' fill='%230f2027'/%3E%3Ctext y='360' x='256' text-anchor='middle' font-size='340' font-family='serif'%3E%F0%9F%9B%A1%EF%B8%8F%3C/text%3E%3C/svg%3E",sizes:"512x512",type:"image/svg+xml",purpose:"any maskable"},
+      {src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='30' fill='%230f2027'/%3E%3Ctext y='140' x='96' text-anchor='middle' font-size='120' font-family='serif'%3E%F0%9F%9B%A1%EF%B8%8F%3C/text%3E%3C/svg%3E",sizes:"192x192",type:"image/svg+xml"}
+    ]
+  };
+  var b=new Blob([JSON.stringify(m)],{type:'application/json'});
+  var l=document.createElement('link');l.rel='manifest';l.href=URL.createObjectURL(b);
+  document.currentScript.after(l);
+})();
+</script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+    min-height: 100vh;
+    padding: 15px;
+    color: #333;
+  }
+  .container {
+    max-width: 950px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    overflow: hidden;
+  }
+  header {
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: #fff;
+    padding: 25px 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 4s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
+  header h1 { font-size: 1.6em; margin-bottom: 5px; position: relative; letter-spacing: 1px; }
+  header p { font-size: 0.9em; opacity: 0.9; position: relative; }
+  .form-section {
+    padding: 22px;
+    border-bottom: 1px solid #e8eef5;
+    background: #fff;
+  }
+  .form-section:nth-child(even) { background: #fafbfd; }
+  .form-section h2 {
+    color: #1e3c72;
+    font-size: 1.15em;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e8eef5;
+  }
+  .form-group { margin-bottom: 15px; }
+  .form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #2a5298;
+    font-size: 0.88em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 11px 12px;
+    border: 2px solid #d0dae8;
+    border-radius: 10px;
+    font-size: 0.95em;
+    transition: all 0.2s;
+    font-family: inherit;
+    background: #fff;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: #2a5298;
+    box-shadow: 0 0 0 3px rgba(42,82,152,0.15);
+  }
+  .form-group textarea { resize: vertical; min-height: 80px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .hint {
+    font-size: 0.78em;
+    color: #7a8a9e;
+    font-style: italic;
+    margin-top: 4px;
+  }
+  .event-menu-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .event-menu {
+    background: linear-gradient(135deg, #f8f9ff, #eef2fb);
+    border: 2px solid #2a5298;
+    border-radius: 12px;
+    padding: 14px;
+    transition: all 0.2s;
+  }
+  .event-menu:hover {
+    box-shadow: 0 4px 15px rgba(42,82,152,0.15);
+  }
+  .event-menu-label {
+    display: block;
+    font-weight: 700;
+    color: #1e3c72;
+    margin-bottom: 10px;
+    font-size: 0.9em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .event-menu select {
+    width: 100%;
+    padding: 11px;
+    border: 2px solid #2a5298;
+    border-radius: 8px;
+    background: #fff;
+    font-size: 0.9em;
+    font-weight: 600;
+    color: #2a5298;
+    cursor: pointer;
+  }
+  .event-selected-preview {
+    background: linear-gradient(135deg, #e8f0fe, #d4e4fc);
+    border: 2px solid #2a5298;
+    border-radius: 10px;
+    padding: 12px;
+    margin-top: 10px;
+    font-size: 0.9em;
+    color: #1e3c72;
+    font-weight: 600;
+    text-align: center;
+  }
+  .datetime-wrapper { position: relative; }
+  .datetime-wrapper .dt-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2em;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .datetime-wrapper input {
+    padding-left: 42px !important;
+    font-size: 1em !important;
+    font-weight: 600;
+    color: #2a5298;
+    background: #f8f9ff;
+    cursor: pointer;
+  }
+  .datetime-wrapper input::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.7;
+    transform: scale(1.2);
+  }
+  .saludo-preview {
+    background: linear-gradient(135deg, #fff3cd, #ffe69c);
+    border: 2px solid #f39c12;
+    border-radius: 10px;
+    padding: 11px 15px;
+    margin-top: 12px;
+    font-size: 0.88em;
+    color: #7d5a00;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .saludo-info {
+    background: linear-gradient(135deg, #d4edda, #b7e4c7);
+    border: 2px solid #27ae60;
+    border-radius: 10px;
+    padding: 11px 15px;
+    margin-top: 8px;
+    font-size: 0.85em;
+    color: #155724;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn {
+    background: linear-gradient(135deg, #2a5298, #1e3c72);
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 600;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(42,82,152,0.2);
+  }
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(42,82,152,0.3); }
+  .btn-danger {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    padding: 6px 12px;
+    font-size: 0.8em;
+    box-shadow: 0 2px 8px rgba(231,76,60,0.2);
+  }
+  .btn-success {
+    background: linear-gradient(135deg, #27ae60, #1e8449);
+    padding: 16px;
+    width: 100%;
+    font-size: 1.05em;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 15px rgba(39,174,96,0.3);
+  }
+  .btn-copy {
+    background: linear-gradient(135deg, #16a085, #117a65);
+    padding: 13px;
+    width: 100%;
+    font-size: 0.95em;
+    box-shadow: 0 4px 15px rgba(22,160,133,0.3);
+  }
+  /* ====== Botón WhatsApp ====== */
+  .btn-whatsapp {
+    background: linear-gradient(135deg, #25D366, #128C7E);
+    padding: 13px;
+    width: 100%;
+    font-size: 0.95em;
+    box-shadow: 0 4px 15px rgba(37,211,102,0.4);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .btn-whatsapp:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(37,211,102,0.5);
+    background: linear-gradient(135deg, #1ebe5d, #0e7a6d);
+  }
+  .btn-whatsapp svg {
+    width: 18px;
+    height: 18px;
+    fill: #fff;
+  }
+  .btn-add {
+    background: linear-gradient(135deg, #f39c12, #d68910);
+    padding: 9px 16px;
+    font-size: 0.88em;
+    box-shadow: 0 2px 8px rgba(243,156,18,0.3);
+  }
+  .item-card {
+    background: #fff;
+    border: 2px solid #e0e8f5;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    transition: all 0.2s;
+  }
+  .item-card:hover {
+    border-color: #2a5298;
+    box-shadow: 0 4px 12px rgba(42,82,152,0.1);
+  }
+  .item-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #1e3c72;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed #d0dae8;
+  }
+  .aspecto-selector {
+    background: linear-gradient(135deg, #fff8e1, #fff3cd);
+    border: 2px solid #f39c12;
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+  .aspecto-selector label {
+    display: block;
+    font-weight: 700;
+    color: #7d5a00;
+    margin-bottom: 8px;
+    font-size: 0.88em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .aspecto-selector select {
+    width: 100%;
+    padding: 11px;
+    border: 2px solid #f39c12;
+    border-radius: 8px;
+    background: #fff;
+    font-size: 0.9em;
+    font-weight: 600;
+    color: #7d5a00;
+    cursor: pointer;
+  }
+  .toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(135deg, #f8f9ff, #eef2fb);
+    border: 2px solid #2a5298;
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+  }
+  .toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+    flex-shrink: 0;
+  }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #ccc;
+    transition: .3s;
+    border-radius: 26px;
+  }
+  .toggle-slider::before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .3s;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+  input:checked + .toggle-slider {
+    background: linear-gradient(135deg, #27ae60, #1e8449);
+  }
+  input:checked + .toggle-slider::before {
+    transform: translateX(24px);
+  }
+  .toggle-label {
+    font-weight: 600;
+    color: #1e3c72;
+    font-size: 0.95em;
+  }
+  .output-section {
+    background: linear-gradient(135deg, #f5f7fa, #e8eef5);
+    padding: 22px;
+  }
+  .output-box {
+    background: #fff;
+    border: 2px solid #2a5298;
+    border-radius: 12px;
+    padding: 16px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+    white-space: pre-wrap;
+    line-height: 1.6;
+    min-height: 200px;
+    max-height: 600px;
+    overflow-y: auto;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .output-box[contenteditable="true"]:focus {
+    outline: 2px solid #f39c12;
+  }
+  .spo-annotation {
+    background: #fff;
+    border: 2px solid #e0e8f5;
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 8px;
+  }
+  .spo-annotation-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 8px;
+    margin-bottom: 5px;
+  }
+  .spo-annotation-row input {
+    padding: 8px;
+    border: 1px solid #d0dae8;
+    border-radius: 6px;
+    font-size: 0.88em;
+  }
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: linear-gradient(135deg, #27ae60, #1e8449);
+    color: #fff;
+    padding: 12px 28px;
+    border-radius: 30px;
+    font-weight: 600;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 1000;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .hidden { display: none !important; }
+  .badge {
+    display: inline-block;
+    background: #2a5298;
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    margin-left: 6px;
+    font-weight: 700;
+  }
+  /* ====== Grid de botones finales ====== */
+  .action-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-top: 15px;
+  }
+  @media (max-width: 600px) {
+    .form-row, .form-row-3, .event-menu-group { grid-template-columns: 1fr; }
+    .action-buttons { grid-template-columns: 1fr; }
+    header h1 { font-size: 1.25em; }
+  }
+
+  /* ── Banner instalación ── */
+  #install-banner {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 2000;
+    background: linear-gradient(135deg, #0f2027, #203a43);
+    border-top: 3px solid #f39c12;
+    padding: 14px 18px;
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.5);
+  }
+  #install-banner .ib-row {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 10px;
+  }
+  #install-banner .ib-ico { font-size: 32px; flex-shrink: 0; }
+  #install-banner .ib-t1 { font-size: 14px; font-weight: 700; color: #f39c12; }
+  #install-banner .ib-t2 { font-size: 12px; color: #aac4d8; margin-top: 2px; }
+  #install-banner .ib-btns { display: flex; gap: 10px; }
+  #install-banner .ib-btns button {
+    flex: 1; padding: 10px; border-radius: 8px;
+    font-size: 13px; font-weight: 700; cursor: pointer; border: none;
+  }
+  .ib-ok { background: #f39c12; color: #0f2027; }
+  .ib-no { background: #1e3a5f; color: #aac4d8; }
+
+  /* ── iOS hint ── */
+  #ios-hint {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 2000;
+    background: linear-gradient(135deg, #0f2027, #203a43);
+    border-top: 3px solid #f39c12;
+    padding: 16px 18px;
+    text-align: center;
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.5);
+  }
+  #ios-hint p { font-size: 13px; color: #e0eaf5; margin-bottom: 6px; line-height: 1.6; }
+  #ios-hint .ios-arrow { font-size: 26px; color: #f39c12; display: block; margin-bottom: 4px; }
+  #ios-hint button {
+    background: #1e3a5f; color: #aac4d8; border: none;
+    border-radius: 8px; padding: 8px 24px;
+    font-size: 12px; font-weight: 600; cursor: pointer; margin-top: 8px;
+  }
+
+  /* ── Footer desarrollador ── */
+  .dev-footer {
+    text-align: center;
+    padding: 14px;
+    font-size: 0.78em;
+    color: #7a8a9e;
+    border-top: 1px solid #e8eef5;
+    background: #f5f7fa;
+  }
+  .dev-footer strong { color: #2a5298; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🛡️ RIPOL 5 — MEBUC</h1>
+    <p>Generador de PIN Institucionales</p>
+  </header>
+
+  <!-- TIPO DE EVENTO -->
+  <div class="form-section">
+    <h2>📌 Tipo de evento</h2>
+    <div class="event-menu-group">
+      <div class="event-menu">
+        <label class="event-menu-label">🥇 Servicio ORO 20</label>
+        <select id="selectOro20">
+          <option value="">— Seleccionar evento —</option>
+          <option value="oro_lesionado_af">LESIONADO CON ARMA DE FUEGO</option>
+          <option value="oro_lesionado_cp">LESIONADO CON ARMA CORTOPUNZANTE</option>
+          <option value="oro_lesionado_at">LESIONADO POR ARMA TRAUMÁTICA</option>
+          <option value="oro_deceso">DECESO HOSPITALARIO</option>
+          <option value="oro_homicidio_af">HOMICIDIO CON ARMA DE FUEGO</option>
+          <option value="oro_homicidio_cp">HOMICIDIO CON ARMA CORTOPUNZANTE</option>
+        </select>
+      </div>
+      <div class="event-menu">
+        <label class="event-menu-label">🕵️ Contrainteligencia</label>
+        <select id="selectContra">
+          <option value="">— Seleccionar evento —</option>
+          <option value="contra_verificacion_x">VERIFICACIÓN PUBLICACIÓN RED SOCIAL X</option>
+          <option value="contra_policial_lesionado">POLICIAL LESIONADO EN PROCESAMIENTO</option>
+          <option value="contra_servicio_policia">SERVICIO DE POLICÍA FRENTE A AFECTACIÓN A LA VIDA</option>
+        </select>
+      </div>
+    </div>
+    <div class="event-selected-preview" id="eventPreview">
+      Selecciona un evento de cualquiera de los dos menús
+    </div>
+  </div>
+
+  <!-- DATOS DEL CASO -->
+  <div class="form-section" id="sectionDatos">
+    <h2>📝 Datos del caso</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label>📅 Fecha del hecho</label>
+        <div class="datetime-wrapper">
+          <span class="dt-icon">📅</span>
+          <input type="date" id="fecha">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>🕐 Hora del hecho</label>
+        <div class="datetime-wrapper">
+          <span class="dt-icon">🕐</span>
+          <input type="time" id="hora">
+        </div>
+      </div>
+    </div>
+    <div class="saludo-info">
+      <span>💡</span>
+      <span>El saludo del PIN se genera según la <strong>hora actual del sistema</strong> (cuando se genera el reporte), no según la hora del hecho.</span>
+    </div>
+    <div class="saludo-preview" id="saludoPreview">
+      <span id="saludoIcono">🌞</span>
+      <span>Saludo actual: <strong id="saludoTexto">buenos días</strong> — <span id="saludoHoraActual"></span></span>
+    </div>
+    <div class="form-group" style="margin-top:15px;" id="groupMunicipio">
+      <label>Municipio</label>
+      <select id="municipio">
+        <option value="BUCARAMANGA">BUCARAMANGA</option>
+        <option value="GIRÓN">GIRÓN</option>
+        <option value="PIEDECUESTA">PIEDECUESTA</option>
+        <option value="LEBRIJA">LEBRIJA</option>
+        <option value="LOS SANTOS">LOS SANTOS</option>
+        <option value="MESA DE LOS SANTOS">MESA DE LOS SANTOS</option>
+        <option value="PESCADERO">PESCADERO</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Lugar exacto del hecho</label>
+      <textarea id="lugar" placeholder="Ej: asentamiento humano las guacamayas casa 39 del Barrio Bucaramanga"></textarea>
+      <div class="hint">Dirección completa tal como debe quedar en el PIN (barrio, asentamiento, vereda, km, etc.)</div>
+    </div>
+  </div>
+
+  <!-- VÍCTIMAS -->
+  <div class="form-section" id="sectionVictimas">
+    <h2 id="tituloVictimas">👤 Víctimas</h2>
+    <div id="victimasContainer"></div>
+    <button class="btn btn-add" onclick="agregarVictima()">＋ Agregar víctima adicional</button>
+  </div>
+
+  <!-- VICTIMARIOS -->
+  <div class="form-section hidden" id="sectionVictimarios">
+    <h2>🦹 Victimarios</h2>
+    <div class="toggle-container">
+      <label class="toggle-switch">
+        <input type="checkbox" id="toggleVictimarios" onchange="toggleVictimariosSection()">
+        <span class="toggle-slider"></span>
+      </label>
+      <span class="toggle-label">¿Desea agregar victimarios?</span>
+    </div>
+    <div id="victimariosContainer" class="hidden"></div>
+    <button class="btn btn-add hidden" id="btnAgregarVictimario" onclick="agregarVictimario()">＋ Agregar victimario</button>
+  </div>
+
+  <!-- ASPECTOS -->
+  <div class="form-section" id="sectionAspectos">
+    <h2>⚠️ Aspectos de interés</h2>
+    <div class="aspecto-selector">
+      <label>📋 Selecciona un aspecto para agregar</label>
+      <select id="aspectoSelect" onchange="agregarAspectoDesdeSelect()">
+        <option value="">— Seleccionar aspecto —</option>
+      </select>
+      <div class="hint" style="margin-top:6px;">💡 Al seleccionar un aspecto se agregará una tarjeta editable con la explicación de qué colocar en ese punto.</div>
+    </div>
+    <div id="aspectosContainer"></div>
+  </div>
+
+  <!-- CAPTURADOS -->
+  <div class="form-section hidden" id="sectionCapturados">
+    <h2>🚔 Capturados <span class="badge" id="badgeCapturados">0</span></h2>
+    <div class="hint" style="margin-bottom:10px;">Si hubo capturas, agrégalas aquí. El número de capturas aparece automáticamente en el encabezado del PIN.</div>
+    <div id="capturadosContainer"></div>
+    <button class="btn btn-add" onclick="agregarCapturado()">＋ Agregar capturado</button>
+  </div>
+
+  <!-- SPOA -->
+  <div class="form-section hidden" id="sectionSPOA">
+    <h2>📋 Antecedentes SPOA — Víctima</h2>
+    <div class="hint" style="margin-bottom:10px;">Estos antecedentes aparecen al final del PIN con el nombre y cédula de la víctima (la cédula se toma automáticamente del campo de la víctima).</div>
+    <div id="spoContainer"></div>
+    <button class="btn btn-add" onclick="agregarSPO()">＋ Agregar anotación SPOA</button>
+  </div>
+
+  <!-- ZAP Y MODALIDAD -->
+  <div class="form-section hidden" id="sectionZap">
+    <h2>📍 ZAP y Modalidad</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Número ZAP</label>
+        <input type="text" id="zapNumero" placeholder="Ej: ZAP-01">
+      </div>
+      <div class="form-group">
+        <label>Modalidad</label>
+        <select id="modalidad">
+          <option value="POR ESTABLECER">POR ESTABLECER</option>
+          <option value="HURTO">HURTO</option>
+          <option value="SICARIATO">SICARIATO</option>
+          <option value="AJUSTE DE CUENTAS">AJUSTE DE CUENTAS</option>
+          <option value="RIÑA">RIÑA</option>
+          <option value="INTOLERANCIA SOCIAL">INTOLERANCIA SOCIAL</option>
+          <option value="VIOLENCIA INTRAFAMILIAR">VIOLENCIA INTRAFAMILIAR</option>
+          <option value="TRÁFICO DE ESTUPEFACIENTES">TRÁFICO DE ESTUPEFACIENTES</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- GENERAR -->
+  <div class="form-section">
+    <button class="btn btn-success" onclick="generarPIN()">⚡ Generar PIN</button>
+  </div>
+
+  <!-- SALIDA -->
+  <div class="output-section">
+    <h2 style="color:#1e3c72;margin-bottom:10px;">✅ PIN listo para WhatsApp</h2>
+    <p style="font-size:0.85em;color:#666;margin-bottom:10px;">Toca el texto para editar si necesitas ajustes. Luego copia o comparte directamente.</p>
+    <div class="output-box" id="output" contenteditable="true">El PIN generado aparecerá aquí...</div>
+    <div class="action-buttons">
+      <button class="btn btn-copy" onclick="copiarPIN()">📋 Copiar</button>
+      <button class="btn-whatsapp" onclick="compartirWhatsApp()">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+        </svg>
+        Compartir en WhatsApp
+      </button>
+      <button class="btn btn-danger" onclick="nuevo()" style="padding:13px;font-size:0.95em;">🔄 Nuevo</button>
+    </div>
+  </div>
+
+  <!-- ── Footer desarrollador ── -->
+  <div class="dev-footer">
+    Desarrollado por <strong>SI. Carlos Santiago</strong> &mdash; MEBUC &copy; 2026
+  </div>
+
+</div><!-- /container -->
+
+<!-- ── Banner instalación Android/Chrome ── -->
+<div id="install-banner">
+  <div class="ib-row">
+    <div class="ib-ico">🛡️</div>
+    <div>
+      <div class="ib-t1">Instala PIN MEBUC en tu celular</div>
+      <div class="ib-t2">Accede rápido desde tu pantalla de inicio, sin necesidad de abrir el navegador.</div>
+    </div>
+  </div>
+  <div class="ib-btns">
+    <button class="ib-ok" onclick="instalarApp()">📲 Instalar aplicación</button>
+    <button class="ib-no" onclick="cerrarBanner()">Ahora no</button>
+  </div>
+</div>
+
+<!-- ── Hint instalación iOS/Safari ── -->
+<div id="ios-hint">
+  <span class="ios-arrow">↓</span>
+  <p>Para instalar en iPhone o iPad:<br>
+     Toca el botón <strong>Compartir</strong> □↑ en Safari<br>
+     y luego <strong>"Agregar a pantalla de inicio"</strong></p>
+  <button onclick="cerrarIosHint()">Entendido</button>
+</div>
+
+<div class="toast" id="toast">✅ Copiado al portapapeles</div>
+
+<script>
+  // ====== CONFIGURACIÓN DE TIPOS DE EVENTO ======
+  const EVENTOS = {
+    oro_lesionado_af: {
+      categoria: 'ORO 20',
+      nombre: 'LESIONADO CON ARMA DE FUEGO',
+      municipioLibre: true,
+      saludo: { destinatario: 'mi General' },
+      plantillaAspectos: [
+        { titulo: 'Motivo / móvil del hecho', placeholder: 'Ej: El hecho se presentó al parecer por la venta y tráfico de estupefacientes ya que la víctima es el encargado de la venta de estupefacientes del barrio Bucaramanga y vendría amenazando a la esposa del victimario por un dinero que le debía por la venta de sustancias alucinógenas.' },
+        { titulo: 'Dinámica del hecho', placeholder: 'Ej: La víctima fue a cobrar el dinero a la esposa del victimario en su residencia y salen ambos de la vivienda y le hacen los disparos impactando uno de ellos contra el lesionado.' },
+        { titulo: 'Estado de la víctima / traslado', placeholder: 'Ej: La víctima se trasladó por sus propios medios a la clínica Bucaramanga, presenta una herida en el tórax pared anterior, se encuentra estable a la espera de rayos X.' },
+        { titulo: 'Reacción policial / capturados', placeholder: 'Ej: En la reacción policial se logra la captura de Jenny Viviana Alfonso Rivera por porte de armas de fuego y Carlos Julio Rosado Beltrán por lesiones personales y porte de arma de fuego, quienes serán dejados a disposición de autoridad competente.' },
+        { titulo: 'Elementos materiales recuperados', placeholder: 'Ej: Se recuperó un arma de fuego tipo revólver calibre 38, serie XXXXX, con X cartuchos sin percutir.' },
+        { titulo: 'Testigos / versiones', placeholder: 'Ej: Testigos manifestaron haber escuchado varias detonaciones y observar a dos sujetos huyendo en una moto de color oscuro.' },
+        { titulo: 'Antecedentes del lugar / zona', placeholder: 'Ej: El sector es conocido por la presencia de habitantes de calle y expendios de estupefacientes.' }
+      ],
+      muestraCapturados: true,
+      muestraSPOA: true,
+      muestraZap: true,
+      muestraHerida: true,
+      muestraUnidad: false,
+      muestraTelefono: false,
+      muestraVictimarios: true,
+      tipoVictima: 'víctima'
+    },
+    oro_lesionado_cp: {
+      categoria: 'ORO 20',
+      nombre: 'LESIONADO CON ARMA CORTOPUNZANTE',
+      municipioLibre: true,
+      saludo: { destinatario: 'mi General' },
+      plantillaAspectos: [
+        { titulo: 'Motivo / móvil del hecho', placeholder: 'Ej: El hecho se presentó al parecer por una riña...' },
+        { titulo: 'Dinámica del hecho', placeholder: 'Ej: La víctima fue atacada con un arma cortopunzante...' },
+        { titulo: 'Estado de la víctima / traslado', placeholder: 'Ej: La víctima fue trasladada en ambulancia...' },
+        { titulo: 'Reacción policial / capturados', placeholder: 'Ej: En la reacción policial se logra la captura de...' },
+        { titulo: 'Elementos materiales recuperados', placeholder: 'Ej: Se recuperó un arma cortopunzante tipo cuchillo...' }
+      ],
+      muestraCapturados: true,
+      muestraSPOA: true,
+      muestraZap: true,
+      muestraHerida: true,
+      muestraUnidad: false,
+      muestraTelefono: false,
+      muestraVictimarios: true,
+      tipoVictima: 'víctima'
+    },
+    oro_lesionado_at: {
+      categoria: 'ORO 20',
+      nombre: 'LESIONADO POR ARMA TRAUMÁTICA',
+      municipioLibre: true,
+      saludo: { destinatario: 'mi General' },
+      plantillaAspectos: [
+        { titulo: 'Motivo / móvil del hecho', placeholder: 'Ej: El hecho se presentó al parecer por...' },
+        { titulo: 'Dinámica del hecho', placeholder: 'Ej: Se registró la detonación de un arma traumática...' },
+        { titulo: 'Estado de la víctima / traslado', placeholder: 'Ej: La víctima fue trasladada...' },
+        { titulo: 'Reacción policial / capturados', placeholder: 'Ej: En la reacción policial se logra la captura de...' }
+      ],
+      muestraCapturados: true,
+      muestraSPOA: true,
+      muestraZap: true,
+      muestraHerida: true,
+      muestraUnidad: false,
+      muestraTelefono: false,
+      muestraVictimarios: true,
+      tipoVictima: 'víctima'
+    },
+    oro_deceso: {
+      categoria: 'ORO 20',
+      nombre: 'DECESO HOSPITALARIO',
+      municipioLibre: true,
+      saludo: { destinatario: 'mi General' },
+      plantillaAspectos: [
+        { titulo: 'Motivo / móvil del hecho', placeholder: 'Ej: El hecho se presentó al parecer por...' },
+        { titulo: 'Dinámica del hecho', placeholder: 'Ej: La víctima fue atacada y posteriormente...' },
+        { titulo: 'Traslado y deceso', placeholder: 'Ej: La víctima fue trasladada a la clínica donde falleció...' },
+        { titulo: 'Reacción policial / capturados', placeholder: 'Ej: En la reacción policial se logra la captura de...' }
+      ],
+      muestraCapturados: true,
+      muestraSPOA: true,
+      muestraZap: true,
+      muestraHerida: true,
+      muestraUnidad: false,
+      muestraTelefono: false,
+      muestraVictimarios: true,
+      tipoVictima: 'víctima'
+    },
+    oro_homicidio_af: {
+      categoria: 'ORO 20',
+      nombre: 'HOMICIDIO CON ARMA DE FUEGO',
+      municipioLibre: true,
+      saludo: { destinatario: 'mi General' },
+      plantillaAspectos: [
+        { titulo: 'Motivo / móvil del hecho', placeholder: 'Ej: El hecho se presentó al parecer por...' },
+        { titulo: 'Dinámica del hecho', placeholder: 'Ej: Los victimarios llegaron al lugar y dispararon...' },
+        { titulo: 'Identificación del occiso', placeholder: 'Ej: El occiso fue identificado como...' },
+        { titulo: 'Reacción policial / capturados', placeholder: 'Ej: En la reacción policial se logra la captura de...' },
+        { titulo: 'Elementos materiales recuperados', placeholder: 'Ej: Se recuperaron vainillas de arma de fuego...' }
+      ],
+      muestraCapturados: true,
+      muestraSPOA: true,
+      muestraZap: true,
+      muestraHerida: false,
+      muestraUnidad: false,
+      muestraTelefono: false,
+      muestraVictimarios: true,
+      tipoVictima: 'occiso'
+    },
+    oro_homicidio_cp: {
+      categoria: 'ORO 20',
+      nombre: 'HOMICIDIO CON ARMA CORTOPUNZANTE',
+      municipioLibre: true,
+      saludo: { destinatario: 'mi General' },
+      plantillaAspectos: [
+        { titulo: 'Motivo / móvil del hecho', placeholder: 'Ej: El hecho se presentó al parecer por...' },
+        { titulo: 'Dinámica del hecho', placeholder: 'Ej: Los victimarios atacaron al occiso con un arma cortopunzante...' },
+        { titulo: 'Identificación del occiso', placeholder: 'Ej: El occiso fue identificado como...' },
+        { titulo: 'Reacción policial / capturados', placeholder: 'Ej: En la reacción policial se logra la captura de...' }
+      ],
+      muestraCapturados: true,
+      muestraSPOA: true,
+      muestraZap: true,
+      muestraHerida: false,
+      muestraUnidad: false,
+      muestraTelefono: false,
+      muestraVictimarios: true,
+      tipoVictima: 'occiso'
+    },
+    contra_verificacion_x: {
+      categoria: 'CONTRAINTELIGENCIA',
+      nombre: 'VERIFICACIÓN PUBLICACIÓN RED SOCIAL X',
+      municipioLibre: false,
+      saludo: { destinatario: 'mi capitán' },
+      plantillaAspectos: [],
+      muestraCapturados: false,
+      muestraSPOA: false,
+      muestraZap: false,
+      muestraHerida: false,
+      muestraUnidad: false,
+      muestraTelefono: false,
+      muestraVictimarios: false,
+      tipoVictima: null
+    },
+    contra_policial_lesionado: {
+      categoria: 'CONTRAINTELIGENCIA',
+      nombre: 'POLICIAL LESIONADO EN PROCESAMIENTO',
+      municipioLibre: false,
+      saludo: { destinatario: 'mi General', prefijo: 'respetuosamente me permito informar la siguiente novedad' },
+      plantillaAspectos: [],
+      muestraCapturados: false,
+      muestraSPOA: false,
+      muestraZap: false,
+      muestraHerida: true,
+      muestraUnidad: true,
+      muestraTelefono: true,
+      muestraVictimarios: false,
+      tipoVictima: 'policial'
+    },
+    contra_servicio_policia: {
+      categoria: 'CONTRAINTELIGENCIA',
+      nombre: 'SERVICIO DE POLICÍA FRENTE A AFECTACIÓN A LA VIDA',
+      municipioLibre: true,
+      saludo: { destinatario: 'mi general' },
+      plantillaAspectos: [
+        { titulo: 'Materialización de los hechos', placeholder: 'Ej: La materialización de los hechos se presentó en jurisdicción de la ZAP...' },
+        { titulo: 'Responsables de la ZAP', placeholder: 'Ej: Responsables de la ZAP. SI Fredy Rubiano Ramos CC. 91456694...' },
+        { titulo: 'Motivo de policía', placeholder: 'Ej: Al momento de los hechos se encontraban atendiendo un motivo de policía...' },
+        { titulo: 'Cobertura ZAP', placeholder: 'Ej: Se encontraban cubriendo la ZAP...' }
+      ],
+      muestraCapturados: false,
+      muestraSPOA: false,
+      muestraZap: false,
+      muestraHerida: false,
+      muestraUnidad: false,
+      muestraTelefono: false,
+      muestraVictimarios: true,
+      tipoVictima: 'víctima'
+    }
+  };
+
+  let eventoSeleccionado = null;
+  let aspectoCount = 0;
+
+  const selectOro = document.getElementById('selectOro20');
+  const selectContra = document.getElementById('selectContra');
+
+  selectOro.addEventListener('change', () => {
+    if (selectOro.value) {
+      selectContra.value = '';
+      seleccionarEvento(selectOro.value);
+    }
+  });
+
+  selectContra.addEventListener('change', () => {
+    if (selectContra.value) {
+      selectOro.value = '';
+      seleccionarEvento(selectContra.value);
+    }
+  });
+
+  function seleccionarEvento(eventoId) {
+    eventoSeleccionado = EVENTOS[eventoId];
+    if (!eventoSeleccionado) return;
+
+    document.getElementById('eventPreview').innerHTML =
+      `<strong>${eventoSeleccionado.categoria}</strong> → ${eventoSeleccionado.nombre}`;
+
+    const config = eventoSeleccionado;
+
+    document.getElementById('groupMunicipio').classList.toggle('hidden', !config.municipioLibre);
+
+    const sectionVictimas = document.getElementById('sectionVictimas');
+    if (config.tipoVictima) {
+      sectionVictimas.classList.remove('hidden');
+      const titulo = document.getElementById('tituloVictimas');
+      if (config.tipoVictima === 'occiso') titulo.innerHTML = '💀 Occisos';
+      else if (config.tipoVictima === 'policial') titulo.innerHTML = '👮 Policial lesionado';
+      else titulo.innerHTML = '👤 Víctimas';
+    } else {
+      sectionVictimas.classList.add('hidden');
+    }
+
+    document.getElementById('sectionVictimarios').classList.toggle('hidden', !config.muestraVictimarios);
+    if (!config.muestraVictimarios) {
+      document.getElementById('toggleVictimarios').checked = false;
+      document.getElementById('victimariosContainer').classList.add('hidden');
+      document.getElementById('btnAgregarVictimario').classList.add('hidden');
+    }
+
+    document.getElementById('sectionCapturados').classList.toggle('hidden', !config.muestraCapturados);
+    document.getElementById('sectionSPOA').classList.toggle('hidden', !config.muestraSPOA);
+    document.getElementById('sectionZap').classList.toggle('hidden', !config.muestraZap);
+
+    cargarAspectosEnSelect(config.plantillaAspectos);
+    document.getElementById('aspectosContainer').innerHTML = '';
+    aspectoCount = 0;
+
+    const noUsaAspectos = ['contra_verificacion_x', 'contra_policial_lesionado'].includes(eventoId);
+    document.getElementById('sectionAspectos').classList.toggle('hidden', noUsaAspectos);
+  }
+
+  function cargarAspectosEnSelect(plantillas) {
+    const select = document.getElementById('aspectoSelect');
+    select.innerHTML = '<option value="">— Seleccionar aspecto —</option>';
+    plantillas.forEach((p, i) => {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = p.titulo;
+      select.appendChild(opt);
+    });
+  }
+
+  function agregarAspectoDesdeSelect() {
+    const select = document.getElementById('aspectoSelect');
+    const idx = select.value;
+    if (idx === '' || !eventoSeleccionado) return;
+
+    const plantilla = eventoSeleccionado.plantillaAspectos[parseInt(idx)];
+    const id = 'aspecto_' + Date.now() + '_' + Math.random();
+    const div = document.createElement('div');
+    div.className = 'item-card';
+    div.innerHTML = `
+      <div class="item-card-header">
+        <span>📌 ${plantilla.titulo}</span>
+        <button class="btn btn-danger" onclick="this.closest('.item-card').remove()">✕</button>
+      </div>
+      <div class="hint" style="margin-bottom:8px;">💡 <strong>Qué colocar aquí:</strong> ${plantilla.titulo}. Escriba la información relevante para este punto.</div>
+      <textarea class="aspecto-text" data-id="${id}" placeholder="${plantilla.placeholder}" style="width:100%;padding:10px;border:1px solid #d0dae8;border-radius:8px;min-height:80px;font-family:inherit;font-size:0.9em;"></textarea>
+    `;
+    document.getElementById('aspectosContainer').appendChild(div);
+    aspectoCount++;
+    select.value = '';
+  }
+
+  function agregarVictima() {
+    const config = eventoSeleccionado;
+    const esPrincipal = document.querySelectorAll('#victimasContainer .item-card').length === 0;
+    const div = document.createElement('div');
+    div.className = 'item-card';
+    div.innerHTML = `
+      <div class="item-card-header">
+        <span>${esPrincipal ? '👤 Víctima principal' : '👥 Víctima adicional #' + (document.querySelectorAll('#victimasContainer .item-card').length + 1)}</span>
+        <button class="btn btn-danger" onclick="this.closest('.item-card').remove(); renumerarVictimas();">✕</button>
+      </div>
+      <div class="form-group">
+        <label>Nombre completo</label>
+        <input type="text" class="v-nombre" placeholder="Ej: Jorge Leonardo Valero Abaunza">
+      </div>
+      <div class="form-row-3">
+        <div class="form-group">
+          <label>Edad</label>
+          <input type="number" class="v-edad" placeholder="Ej: 36">
+        </div>
+        <div class="form-group">
+          <label>Alias (opcional)</label>
+          <input type="text" class="v-alias" placeholder="Ej: El Gordo">
+        </div>
+        <div class="form-group">
+          <label>Cédula</label>
+          <input type="text" class="v-cedula" placeholder="Ej: 1102362852">
+        </div>
+      </div>
+      <div class="form-group ${config && !config.muestraHerida ? 'hidden' : ''}" data-field="herida">
+        <label>${config && config.tipoVictima === 'occiso' ? 'Causa de muerte' : 'Herida / lesión principal'}</label>
+        <input type="text" class="v-herida" placeholder="${config && config.tipoVictima === 'occiso' ? 'Ej: múltiples impactos de arma de fuego' : 'Ej: una herida en el tórax'}">
+      </div>
+      <div class="form-group ${config && !config.muestraUnidad ? 'hidden' : ''}" data-field="unidad">
+        <label>Unidad a la que está adscrito</label>
+        <input type="text" class="v-unidad" placeholder="Ej: FUDIS">
+      </div>
+      <div class="form-group ${config && !config.muestraTelefono ? 'hidden' : ''}" data-field="telefono">
+        <label>Celular</label>
+        <input type="text" class="v-telefono" placeholder="Ej: 3208850848">
+      </div>
+    `;
+    document.getElementById('victimasContainer').appendChild(div);
+  }
+
+  function renumerarVictimas() {
+    const cards = document.querySelectorAll('#victimasContainer .item-card');
+    cards.forEach((c, i) => {
+      const header = c.querySelector('.item-card-header span');
+      if (i === 0) header.innerHTML = '👤 Víctima principal';
+      else header.innerHTML = `👥 Víctima adicional #${i + 1}`;
+    });
+  }
+
+  function toggleVictimariosSection() {
+    const checked = document.getElementById('toggleVictimarios').checked;
+    document.getElementById('victimariosContainer').classList.toggle('hidden', !checked);
+    document.getElementById('btnAgregarVictimario').classList.toggle('hidden', !checked);
+    if (checked && document.querySelectorAll('#victimariosContainer .item-card').length === 0) {
+      agregarVictimario();
+    }
+  }
+
+  function agregarVictimario() {
+    const div = document.createElement('div');
+    div.className = 'item-card';
+    div.innerHTML = `
+      <div class="item-card-header">
+        <span>🦹 Victimario #<span class="vm-num"></span></span>
+        <button class="btn btn-danger" onclick="this.closest('.item-card').remove(); renumerarVictimarios();">✕</button>
+      </div>
+      <div class="form-group">
+        <label>Nombre completo</label>
+        <input type="text" class="vm-nombre" placeholder="Ej: Carlos Julio Rosado Beltrán">
+      </div>
+      <div class="form-row-3">
+        <div class="form-group">
+          <label>Cédula</label>
+          <input type="text" class="vm-cedula" placeholder="Ej: 1098703456">
+        </div>
+        <div class="form-group">
+          <label>Alias (opcional)</label>
+          <input type="text" class="vm-alias" placeholder="Ej: El Gordo">
+        </div>
+        <div class="form-group">
+          <label>Motivo / delito</label>
+          <input type="text" class="vm-motivo" placeholder="Ej: lesiones personales y porte de arma de fuego">
+        </div>
+      </div>
+    `;
+    document.getElementById('victimariosContainer').appendChild(div);
+    renumerarVictimarios();
+  }
+
+  function renumerarVictimarios() {
+    const cards = document.querySelectorAll('#victimariosContainer .item-card');
+    cards.forEach((c, i) => {
+      c.querySelector('.vm-num').textContent = i + 1;
+    });
+  }
+
+  function agregarCapturado() {
+    const div = document.createElement('div');
+    div.className = 'item-card';
+    div.innerHTML = `
+      <div class="item-card-header">
+        <span>🚔 Capturado #<span class="capt-num"></span></span>
+        <button class="btn btn-danger" onclick="this.closest('.item-card').remove(); actualizarNumsCapturados();">✕</button>
+      </div>
+      <div class="form-group">
+        <label>Nombre completo</label>
+        <input type="text" class="capt-nombre" placeholder="Ej: Jenny Viviana Alfonso Rivera">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Cédula</label>
+          <input type="text" class="capt-cedula" placeholder="Ej: 1098703456">
+        </div>
+        <div class="form-group">
+          <label>Motivo de captura</label>
+          <input type="text" class="capt-motivo" placeholder="Ej: porte de armas de fuego">
+        </div>
+      </div>
+    `;
+    document.getElementById('capturadosContainer').appendChild(div);
+    actualizarNumsCapturados();
+  }
+
+  function actualizarNumsCapturados() {
+    const cards = document.querySelectorAll('#capturadosContainer .item-card');
+    cards.forEach((c, i) => {
+      c.querySelector('.capt-num').textContent = i + 1;
+    });
+    document.getElementById('badgeCapturados').textContent = cards.length;
+  }
+
+  function agregarSPO() {
+    const div = document.createElement('div');
+    div.className = 'spo-annotation';
+    div.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <strong style="color:#1e3c72;">📋 Anotación SPOA #<span class="spo-num"></span></strong>
+        <button class="btn btn-danger" onclick="this.closest('.spo-annotation').remove(); actualizarNumsSPO();">✕</button>
+      </div>
+      <div class="spo-annotation-row">
+        <input type="text" class="spo-delito" placeholder="Delito (Ej: Estupefacientes)">
+        <input type="text" class="spo-anos" placeholder="Años (Ej: 2026, 2025, 2014, 2011)">
+      </div>
+    `;
+    document.getElementById('spoContainer').appendChild(div);
+    actualizarNumsSPO();
+  }
+
+  function actualizarNumsSPO() {
+    const cards = document.querySelectorAll('#spoContainer .spo-annotation');
+    cards.forEach((c, i) => {
+      c.querySelector('.spo-num').textContent = i + 1;
+    });
+  }
+
+  function obtenerSaludoActual() {
+    const horas = new Date().getHours();
+    if (horas >= 0 && horas < 12) return { texto: 'buenos días', icono: '🌞' };
+    if (horas >= 12 && horas < 18) return { texto: 'buenas tardes', icono: '🌤️' };
+    return { texto: 'buenas noches', icono: '🌙' };
+  }
+
+  function actualizarSaludoPreview() {
+    const saludo = obtenerSaludoActual();
+    document.getElementById('saludoTexto').textContent = saludo.texto;
+    document.getElementById('saludoIcono').textContent = saludo.icono;
+    const ahora = new Date();
+    const hh = String(ahora.getHours()).padStart(2, '0');
+    const mm = String(ahora.getMinutes()).padStart(2, '0');
+    document.getElementById('saludoHoraActual').textContent = `(Hora del sistema: ${hh}:${mm})`;
+  }
+
+  function generarPIN() {
+    if (!eventoSeleccionado) {
+      alert('⚠️ Por favor selecciona un tipo de evento primero.');
+      return;
+    }
+
+    const fecha = document.getElementById('fecha').value;
+    const hora = document.getElementById('hora').value;
+    const municipio = document.getElementById('municipio').value;
+    const lugar = document.getElementById('lugar').value.trim();
+
+    let fechaFmt = '';
+    if (fecha) {
+      const [y, m, d] = fecha.split('-');
+      fechaFmt = `${d}/${m}/${y}`;
+    }
+    let horaFmt = '';
+    if (hora) horaFmt = hora.substring(0, 5);
+
+    const saludo = obtenerSaludoActual();
+
+    const victimas = [];
+    document.querySelectorAll('#victimasContainer .item-card').forEach(card => {
+      victimas.push({
+        nombre: card.querySelector('.v-nombre').value.trim(),
+        edad: card.querySelector('.v-edad').value.trim(),
+        alias: card.querySelector('.v-alias').value.trim(),
+        cedula: card.querySelector('.v-cedula').value.trim(),
+        herida: card.querySelector('.v-herida') ? card.querySelector('.v-herida').value.trim() : '',
+        unidad: card.querySelector('.v-unidad') ? card.querySelector('.v-unidad').value.trim() : '',
+        telefono: card.querySelector('.v-telefono') ? card.querySelector('.v-telefono').value.trim() : ''
+      });
+    });
+
+    const victimarios = [];
+    document.querySelectorAll('#victimariosContainer .item-card').forEach(card => {
+      const nombre = card.querySelector('.vm-nombre').value.trim();
+      if (nombre) {
+        victimarios.push({
+          nombre,
+          cedula: card.querySelector('.vm-cedula').value.trim(),
+          alias: card.querySelector('.vm-alias').value.trim(),
+          motivo: card.querySelector('.vm-motivo').value.trim()
+        });
+      }
+    });
+
+    let pin = '';
+    const evId = Object.keys(EVENTOS).find(k => EVENTOS[k] === eventoSeleccionado);
+
+    if (evId.startsWith('oro_')) {
+      pin = generarOro20(evId, { fechaFmt, horaFmt, municipio, lugar, victimas, victimarios, saludo });
+    } else if (evId === 'contra_verificacion_x') {
+      pin = generarContraVerificacionX({ fechaFmt, horaFmt, saludo });
+    } else if (evId === 'contra_policial_lesionado') {
+      pin = generarContraPolicialLesionado({ fechaFmt, horaFmt, saludo, victimas });
+    } else if (evId === 'contra_servicio_policia') {
+      pin = generarContraServicioPolicia({ fechaFmt, horaFmt, municipio, lugar, victimas, victimarios, saludo });
+    }
+
+    document.getElementById('output').textContent = pin;
+    document.getElementById('output').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function generarOro20(evId, d) {
+    const config = EVENTOS[evId];
+    const capturados = [];
+    document.querySelectorAll('#capturadosContainer .item-card').forEach(card => {
+      const nombre = card.querySelector('.capt-nombre').value.trim();
+      const cedula = card.querySelector('.capt-cedula').value.trim();
+      const motivo = card.querySelector('.capt-motivo').value.trim();
+      if (nombre) capturados.push({ nombre, cedula, motivo });
+    });
+    const numCapturas = capturados.length;
+    const capturasTexto = numCapturas > 0 ? ` Y ${String(numCapturas).padStart(2,'0')} CAPTURAS` : '';
+
+    let pin = `*RIPOL5 - MEBUC - ${config.nombre}${capturasTexto} EN EL MPIO DE ${d.municipio}*\n\n`;
+    pin += `Dios y patria, mi General, ${d.saludo.texto}.\n\n`;
+
+    const vPrincipal = d.victimas[0] || {};
+    let victimaTexto = `*${vPrincipal.nombre || '[Nombre]'}*`;
+    if (vPrincipal.alias) victimaTexto += ` alias *${vPrincipal.alias}*`;
+    if (vPrincipal.edad) victimaTexto += ` (${vPrincipal.edad} años)`;
+
+    if (evId.includes('homicidio') || evId === 'oro_deceso') {
+      pin += `El ${d.fechaFmt || '[fecha]'} sobre las ${d.horaFmt || '[hora]'} horas, en ${d.lugar || '[lugar]'}, se presentó el ${config.nombre.toLowerCase()} de ${victimaTexto}.\n\n`;
+    } else {
+      pin += `El ${d.fechaFmt || '[fecha]'} sobre las ${d.horaFmt || '[hora]'} horas, en ${d.lugar || '[lugar]'}, resultó lesionado ${victimaTexto}, quien presenta ${vPrincipal.herida || '[herida/lesión]'}.\n\n`;
+    }
+
+    if (d.victimas.length > 1) {
+      pin += `*Víctimas adicionales:*\n\n`;
+      for (let i = 1; i < d.victimas.length; i++) {
+        const v = d.victimas[i];
+        let txt = `* ${v.nombre || '[Nombre]'}`;
+        if (v.edad) txt += ` (${v.edad} años)`;
+        if (v.herida) txt += `, presenta ${v.herida}`;
+        pin += txt + `\n`;
+      }
+      pin += `\n`;
+    }
+
+    if (d.victimarios.length > 0) {
+      pin += `*Victimarios:*\n\n`;
+      d.victimarios.forEach(vm => {
+        let txt = `* ${vm.nombre}`;
+        if (vm.alias) txt += ` alias *${vm.alias}*`;
+        if (vm.cedula) txt += ` CC. ${vm.cedula}`;
+        if (vm.motivo) txt += `, por ${vm.motivo}`;
+        pin += txt + `\n`;
+      });
+      pin += `\n`;
+    }
+
+    const aspectos = [];
+    document.querySelectorAll('.aspecto-text').forEach(t => {
+      const val = t.value.trim();
+      if (val) aspectos.push(val);
+    });
+    if (aspectos.length > 0) {
+      pin += `*Aspectos de interés*\n\n`;
+      aspectos.forEach(a => { pin += `* ${a}\n\n`; });
+    }
+
+    const spoAnotaciones = [];
+    document.querySelectorAll('#spoContainer .spo-annotation').forEach(card => {
+      const delito = card.querySelector('.spo-delito').value.trim();
+      const anos = card.querySelector('.spo-anos').value.trim();
+      if (delito && anos) spoAnotaciones.push({ delito, anos });
+    });
+
+    if (spoAnotaciones.length > 0 && vPrincipal.nombre) {
+      pin += `La víctima presenta las siguientes anotaciones por SPOA\n`;
+      pin += `${vPrincipal.nombre}\n`;
+      pin += `${vPrincipal.cedula || '[Cédula]'}\n\n`;
+      pin += `Indiciado por\n\n`;
+      spoAnotaciones.forEach((s, i) => {
+        pin += `-${String(i+1).padStart(2,'0')} por ${s.delito} año ${s.anos}\n`;
+      });
+      pin += `\n`;
+    }
+
+    return pin;
+  }
+
+  function generarContraVerificacionX(d) {
+    const columnista = document.getElementById('cvColumnista') ? document.getElementById('cvColumnista').value.trim() : '';
+    const medio = document.getElementById('cvMedio') ? document.getElementById('cvMedio').value.trim() : '';
+    const descripcion = document.getElementById('cvDescripcion') ? document.getElementById('cvDescripcion').value.trim() : '';
+    const lugarHechos = document.getElementById('cvLugarHechos') ? document.getElementById('cvLugarHechos').value.trim() : '';
+    const ordenServicio = document.getElementById('cvOrdenServicio') ? document.getElementById('cvOrdenServicio').value.trim() : '';
+    const uniformados = document.getElementById('cvUniformados') ? document.getElementById('cvUniformados').value.trim() : '';
+    const investigacion = document.getElementById('cvInvestigacion') ? document.getElementById('cvInvestigacion').value.trim() : '';
+    const novedad = document.getElementById('cvNovedad') ? document.getElementById('cvNovedad').value.trim() : '';
+
+    let pin = `*RIPOL5 - MEBUC - ACTIVIDADES DE VERIFICACIÓN FRENTE A PUBLICACIÓN DE ABUSO DE AUTORIDAD EN LA RED SOCIAL X*\n\n`;
+    pin += `Dios y Patria mi capitán, ${d.saludo.texto}.\n\n`;
+
+    let medioTexto = medio ? ` de ${medio}` : '';
+    pin += `Teniendo en cuenta la publicación realizada a través del perfil de la red social X por el columnista${medioTexto}, *${columnista || '[Columnista]'}*, en la cual se dio a conocer una denuncia relacionada con ${descripcion || '[descripción]'}, es preciso indicar lo siguiente:\n\n`;
+
+    pin += `* *Los hechos se registraron el ${d.fechaFmt || '[fecha]'}, aproximadamente a las ${d.horaFmt || '[hora]'} horas*, en ${lugarHechos || '[lugar]'}.\n\n`;
+
+    if (ordenServicio) pin += `* Los uniformados que participaron en el procedimiento se encontraban relacionados en la ${ordenServicio}.\n\n`;
+    if (uniformados) pin += `* De acuerdo con la verificación realizada, los uniformados que habrían intervenido en el procedimiento corresponden al *${uniformados.replace(/\n/g, '; ')}*.\n\n`;
+    if (investigacion) pin += `* Con ocasión de estos hechos, ${investigacion}\n\n`;
+    if (novedad) pin += `* La novedad fue cargada oportunamente, mediante ${novedad}.\n`;
+
+    return pin;
+  }
+
+  function generarContraPolicialLesionado(d) {
+    const numeroDia = document.getElementById('cpNumeroDia') ? document.getElementById('cpNumeroDia').value || 'X' : 'X';
+    const distrito = document.getElementById('cpDistrito') ? document.getElementById('cpDistrito').value.trim() || 'X' : 'X';
+    const estacion = document.getElementById('cpEstacion') ? document.getElementById('cpEstacion').value.trim() || 'X' : 'X';
+    const fuente = document.getElementById('cpFuente') ? document.getElementById('cpFuente').value.trim() : '';
+    const unidad = document.getElementById('cpUnidad') ? document.getElementById('cpUnidad').value.trim() : '';
+    const sector = document.getElementById('cpSector') ? document.getElementById('cpSector').value.trim() : '';
+    const transporte = document.getElementById('cpTransporte') ? document.getElementById('cpTransporte').value.trim() : '';
+    const hechos = document.getElementById('cpHechos') ? document.getElementById('cpHechos').value.trim() : '';
+    const clinica = document.getElementById('cpClinica') ? document.getElementById('cpClinica').value.trim() : '';
+    const estadoSalud = document.getElementById('cpEstadoSalud') ? document.getElementById('cpEstadoSalud').value.trim() : '';
+
+    const p = d.victimas[0] || {};
+
+    let pin = `🟢*POLICIAL LESIONADO EN PROCESAMIENTO  - (NUMERO ${numeroDia} DEL DIA) DISTRITO ${distrito} – ESTACIÓN ${estacion.toUpperCase()}*\n\n`;
+    pin += `_Dios y patria mi General ${d.saludo.texto}, ${d.saludo.prefijo}_\n\n`;
+
+    pin += `*Hechos*: Siendo las ${d.horaFmt || '[hora]'} horas del día ${d.fechaFmt || '[fecha]'}, según información suministrada por ${fuente || '[fuente]'}, que el ${unidad || '[unidad]'} que se encontraba de servicio en el sector de ${sector || '[sector]'} quienes se movilizaban en ${transporte || '[transporte]'}, ${hechos || '[descripción de los hechos]'}${clinica ? `, y posteriormente se trasladan a las instalaciones de la ${clinica}` : ''}${estadoSalud ? `, donde se encuentra recibiendo atención médica. Estado de salud: ${estadoSalud}.` : '.'}\n\n`;
+
+    pin += `*Lesionado*: *${p.nombre || '[Nombre del policial]'}*`;
+    if (p.cedula) pin += `, CC. ${p.cedula}`;
+    if (p.unidad) pin += `, adscrita a la ${p.unidad}`;
+    if (p.telefono) pin += `,\nCelular: ${p.telefono}`;
+    if (p.herida) pin += `\npresenta: ${p.herida}.`;
+    pin += `\n`;
+
+    const aspectos = [];
+    document.querySelectorAll('.aspecto-text').forEach(t => {
+      const val = t.value.trim();
+      if (val) aspectos.push(val);
+    });
+    if (aspectos.length > 0) {
+      pin += `\n*ASPECTOS INTERÉS* se informa a\n`;
+      aspectos.forEach(a => { pin += `• ${a}\n`; });
+    }
+
+    pin += `\n> *NOTA: Recuerde que cualquier uso, difusión, distribución, copiado o divulgación de esta comunicación está estrictamente prohibido.*\n`;
+
+    return pin;
+  }
+
+  function generarContraServicioPolicia(d) {
+    const zap = document.getElementById('csZap') ? document.getElementById('csZap').value.trim() : '';
+    const estacion = document.getElementById('csEstacion') ? document.getElementById('csEstacion').value.trim() : '';
+    const responsables = document.getElementById('csResponsables') ? document.getElementById('csResponsables').value.trim() : '';
+    const motivo = document.getElementById('csMotivo') ? document.getElementById('csMotivo').value.trim() : '';
+    const zapCubrir = document.getElementById('csZapCubrir') ? document.getElementById('csZapCubrir').value.trim() : '';
+
+    const vPrincipal = d.victimas[0] || {};
+    let victimaTexto = `*${vPrincipal.nombre || '[Nombre]'}*`;
+    if (vPrincipal.edad) victimaTexto += ` de (${vPrincipal.edad}) años`;
+
+    let pin = `*RIPOL5 - MEBUC - SERVICIO DE POLICÍA FRENTE A HECHOS DE AFECTACIÓN A LA VIDA EN ${d.municipio}*\n\n`;
+    pin += `Dios y patria mi general, ${d.saludo.texto}.\n\n`;
+    pin += `El ${d.fechaFmt || '[fecha]'} sobre las ${d.horaFmt || '[hora]'} horas, en ${d.lugar || '[lugar]'}, se presentó el homicidio de ${victimaTexto}.\n\n`;
+    pin += `*Servicio de Policía*\n\n`;
+
+    if (zap || estacion) pin += `* La materialización de los hechos, se presentó en jurisdicción de la ${zap || '[ZAP]'}, ${estacion ? 'Estación de Policía ' + estacion : ''}.\n\n`;
+    if (responsables) pin += `* Responsables de la ${zap || '[ZAP]'}. ${responsables.replace(/\n/g, ' ')}.\n\n`;
+    if (motivo) pin += `* Al momento de los hechos, se encontraban atendiendo ${motivo}.\n\n`;
+    if (zapCubrir) pin += `* Se encontraban cubriendo ${zapCubrir}.\n\n`;
+
+    if (d.victimarios.length > 0) {
+      pin += `*Victimarios:*\n\n`;
+      d.victimarios.forEach(vm => {
+        let txt = `* ${vm.nombre}`;
+        if (vm.alias) txt += ` alias *${vm.alias}*`;
+        if (vm.cedula) txt += ` CC. ${vm.cedula}`;
+        if (vm.motivo) txt += `, por ${vm.motivo}`;
+        pin += txt + `\n`;
+      });
+      pin += `\n`;
+    }
+
+    return pin;
+  }
+
+  // ====== COPIAR AL PORTAPAPELES ======
+  function copiarPIN() {
+    const texto = document.getElementById('output').textContent;
+    if (!texto || texto === 'El PIN generado aparecerá aquí...') {
+      alert('⚠️ Primero genera el PIN.');
+      return;
+    }
+    navigator.clipboard.writeText(texto).then(() => {
+      mostrarToast('✅ Copiado al portapapeles');
+    }).catch(() => {
+      const range = document.createRange();
+      range.selectNode(document.getElementById('output'));
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(range);
+      document.execCommand('copy');
+      window.getSelection().removeAllRanges();
+      mostrarToast('✅ Copiado al portapapeles');
+    });
+  }
+
+  // ====== COMPARTIR DIRECTAMENTE EN WHATSAPP ======
+  function compartirWhatsApp() {
+    const texto = document.getElementById('output').textContent;
+    if (!texto || texto === 'El PIN generado aparecerá aquí...') {
+      alert('⚠️ Primero genera el PIN.');
+      return;
+    }
+    // Codificar el texto para URL
+    const textoCodificado = encodeURIComponent(texto);
+    // Abrir WhatsApp Web / App
+    const url = `https://wa.me/?text=${textoCodificado}`;
+    window.open(url, '_blank');
+    mostrarToast('📱 Abriendo WhatsApp...');
+  }
+
+  // ====== TOAST ======
+  function mostrarToast(mensaje) {
+    const toast = document.getElementById('toast');
+    toast.textContent = mensaje;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+  }
+
+  function nuevo() {
+    if (confirm('¿Seguro que deseas limpiar todo el formulario?')) {
+      location.reload();
+    }
+  }
+
+  window.addEventListener('load', () => {
+    const hoy = new Date();
+    const yyyy = hoy.getFullYear();
+    const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+    const dd = String(hoy.getDate()).padStart(2, '0');
+    document.getElementById('fecha').value = `${yyyy}-${mm}-${dd}`;
+    const hh = String(hoy.getHours()).padStart(2, '0');
+    const mi = String(hoy.getMinutes()).padStart(2, '0');
+    document.getElementById('hora').value = `${hh}:${mi}`;
+
+    actualizarSaludoPreview();
+    setInterval(actualizarSaludoPreview, 60000);
+
+    agregarVictima();
+
+    // ── PWA: iOS hint ──────────────────────────────────────
+    function isIOS() {
+      return /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+    }
+    function isStandalone() {
+      return window.matchMedia('(display-mode: standalone)').matches
+          || window.navigator.standalone === true;
+    }
+    if (isIOS() && !isStandalone() && !localStorage.getItem('ios_hint_dismissed')) {
+      setTimeout(() => {
+        document.getElementById('ios-hint').style.display = 'block';
+      }, 2000);
+    }
+  });
+
+  // ── PWA: capturar evento Android/Chrome ───────────────────
+  let deferredPrompt = null;
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    const yaInstalada = window.matchMedia('(display-mode: standalone)').matches;
+    const descartado  = localStorage.getItem('banner_dismissed');
+    if (!yaInstalada && !descartado) {
+      setTimeout(() => {
+        document.getElementById('install-banner').style.display = 'block';
+      }, 1800);
+    }
+  });
+
+  window.addEventListener('appinstalled', () => {
+    document.getElementById('install-banner').style.display = 'none';
+    mostrarToast('✅ Aplicación instalada correctamente');
+  });
+
+  function instalarApp() {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((result) => {
+        document.getElementById('install-banner').style.display = 'none';
+        deferredPrompt = null;
+        if (result.outcome === 'accepted') {
+          mostrarToast('✅ Instalando aplicación...');
+        }
+      });
+    }
+  }
+
+  function cerrarBanner() {
+    document.getElementById('install-banner').style.display = 'none';
+    localStorage.setItem('banner_dismissed', '1');
+  }
+
+  function cerrarIosHint() {
+    document.getElementById('ios-hint').style.display = 'none';
+    localStorage.setItem('ios_hint_dismissed', '1');
+  }
+</script>
+</body>
+</html>
