@@ -2,6 +2,12 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<script>
+(function(){
+  var standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
+  if (standalone) document.documentElement.classList.add('is-installed');
+})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <link rel="manifest" href="manifest.json">
@@ -33,6 +39,16 @@ body{
   min-height:100vh;padding:16px;color:var(--texto);font-size:15px;line-height:1.6;
 }
 .app{max-width:980px;margin:0 auto;background:var(--blanco);border-radius:20px;box-shadow:0 24px 80px rgba(0,0,0,.35);overflow:hidden;}
+
+/* Portón de instalación obligatoria */
+html:not(.is-installed) .app{display:none;}
+#install-gate{position:fixed;inset:0;z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px 24px;background:linear-gradient(140deg,#0f2027 0%,#1a3a6e 55%,#2c5364 100%);color:#fff;}
+html:not(.is-installed) #install-gate{display:flex;}
+#install-gate .gate-icon{width:72px;height:72px;background:rgba(255,255,255,.12);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:22px;border:1px solid rgba(255,255,255,.18);}
+#install-gate h1{font-size:1.25em;margin-bottom:10px;}
+#install-gate p{color:rgba(255,255,255,.75);font-size:.92em;max-width:320px;margin-bottom:22px;line-height:1.5;}
+#install-gate button{background:#f9a825;color:#0f2027;border:none;padding:14px 30px;border-radius:12px;font-weight:700;font-size:.95em;cursor:pointer;display:none;}
+#install-gate.blocked h1{color:#ff8a65;}
 
 /* Header */
 header{background:linear-gradient(120deg,#0f2027 0%,#1a3a6e 60%,#2c5364 100%);padding:28px 28px 22px;display:flex;align-items:center;gap:16px;position:relative;overflow:hidden;}
@@ -173,6 +189,14 @@ header::after{content:'';position:absolute;inset:0;background:radial-gradient(el
 </style>
 </head>
 <body>
+
+<div id="install-gate">
+  <div class="gate-icon">📲</div>
+  <h1 id="gate-title">Instala la aplicación</h1>
+  <p id="gate-text">Para usar el Generador de PIN necesitas instalar la aplicación en tu dispositivo.</p>
+  <button id="gate-btn">Instalar aplicación</button>
+</div>
+
 <div class="app">
 
   <!-- Header -->
@@ -884,6 +908,53 @@ function cerrarIosHint(){
 
   localStorage.setItem('ios_hint_dismissed','1');
 }
+</script>
+
+<script>
+(function(){
+  if (document.documentElement.classList.contains('is-installed')) return; // ya corre como app instalada
+
+  var deferredPrompt = null;
+  var gate = document.getElementById('install-gate');
+  var btn = document.getElementById('gate-btn');
+  var title = document.getElementById('gate-title');
+  var text = document.getElementById('gate-text');
+
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault();
+    deferredPrompt = e;
+    btn.style.display = 'inline-block';
+  });
+
+  window.addEventListener('appinstalled', function(){
+    btn.style.display = 'none';
+    title.textContent = '✅ App instalada';
+    text.textContent = 'Cierra esta pestaña del navegador y abre la app desde el ícono agregado a tu pantalla de inicio.';
+  });
+
+  btn.addEventListener('click', function(){
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(function(choice){
+      if (choice.outcome !== 'accepted') {
+        gate.classList.add('blocked');
+        title.textContent = '🚫 Debes instalar para continuar';
+        text.textContent = 'Esta aplicación solo puede usarse una vez instalada en tu dispositivo. Toca el botón para intentar de nuevo.';
+      }
+      deferredPrompt = null;
+    });
+  });
+
+  // Si el navegador no ofrece instalar (ya está instalada o es Safari/iOS,
+  // que no tiene diálogo automático), mostramos instrucciones manuales.
+  setTimeout(function(){
+    if (!deferredPrompt) {
+      btn.style.display = 'none';
+      title.textContent = '📲 Abre la app desde tu pantalla de inicio';
+      text.textContent = 'Si ya la instalaste, ábrela desde su ícono. Si no, usa el menú de tu navegador y elige "Agregar a pantalla de inicio" o "Instalar aplicación".';
+    }
+  }, 1200);
+})();
 </script>
 
 <script>
