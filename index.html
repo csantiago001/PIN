@@ -299,14 +299,16 @@ header::after{content:'';position:absolute;inset:0;background:radial-gradient(el
   <!-- ASPECTOS -->
   <div class="section hidden" id="sectionAspectos">
     <div class="section-title"><div class="icon">⚠️</div>Aspectos de interés</div>
-    <div class="aspecto-box">
-      <label>📋 Selecciona un aspecto para agregar</label>
-      <select id="aspectoSelect" onchange="agregarAspectoDesdeSelect()">
-        <option value="">— Seleccionar aspecto —</option>
-      </select>
-      <div class="hint" style="margin-top:6px;">Al seleccionar un aspecto se agrega una tarjeta editable.</div>
+    <div id="aspectosList"></div>
+    <div class="aspecto-box hidden" id="aspectoInputBox">
+      <label id="aspectoInputLabel">✏️ Escribe el aspecto de interés</label>
+      <textarea id="aspectoInputText" style="width:100%;padding:10px;border:1.5px solid #f9a825;border-radius:8px;min-height:80px;font-family:inherit;font-size:.9em;" placeholder="Escribe aquí el aspecto de interés..."></textarea>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button class="btn btn-add" onclick="guardarAspecto()">💾 Guardar aspecto de interés</button>
+        <button class="btn btn-danger" style="padding:9px 16px;font-size:.85em;" onclick="cancelarAspecto()">Cancelar</button>
+      </div>
     </div>
-    <div id="aspectosContainer"></div>
+    <button class="btn btn-add" id="btnAgregarAspecto" onclick="mostrarInputAspecto()">＋ Agregar aspecto de interés</button>
   </div>
 
   <!-- CAPTURADOS -->
@@ -459,8 +461,11 @@ function seleccionarEvento(id){
   // bloque victimario del SPOA: oculto hasta que haya victimarios
   document.getElementById('spoaBlockVictimario').classList.add('hidden');
   document.getElementById('sectionZap').classList.toggle('hidden',!c.muestraZap);
-  cargarAspectosEnSelect(c.plantillaAspectos);
-  document.getElementById('aspectosContainer').innerHTML='';
+  aspectosData=[];aspectoEditIndex=null;
+  document.getElementById('aspectosList').innerHTML='';
+  document.getElementById('aspectoInputBox').classList.add('hidden');
+  document.getElementById('btnAgregarAspecto').classList.remove('hidden');
+  document.getElementById('aspectoInputText').value='';
   const noAspectos=['contra_verificacion_x','contra_policial_lesionado'].includes(id);
   document.getElementById('sectionAspectos').classList.toggle('hidden',noAspectos);
   document.getElementById('victimasContainer').innerHTML='';
@@ -470,21 +475,65 @@ function seleccionarEvento(id){
   if(c.tipoVictima)agregarVictima();
 }
 
-function cargarAspectosEnSelect(pl){
-  const s=document.getElementById('aspectoSelect');
-  s.innerHTML='<option value="">— Seleccionar aspecto —</option>';
-  pl.forEach((p,i)=>{const o=document.createElement('option');o.value=i;o.textContent=p.titulo;s.appendChild(o);});
+let aspectosData=[];
+let aspectoEditIndex=null;
+
+function mostrarInputAspecto(editIndex){
+  aspectoEditIndex=(editIndex===undefined)?null:editIndex;
+  const label=document.getElementById('aspectoInputLabel');
+  const textarea=document.getElementById('aspectoInputText');
+  if(aspectoEditIndex!==null){
+    label.textContent='✏️ Editar aspecto de interés';
+    textarea.value=aspectosData[aspectoEditIndex];
+  }else{
+    label.textContent='✏️ Escribe el aspecto de interés';
+    textarea.value='';
+  }
+  document.getElementById('aspectoInputBox').classList.remove('hidden');
+  document.getElementById('btnAgregarAspecto').classList.add('hidden');
+  textarea.focus();
 }
 
-function agregarAspectoDesdeSelect(){
-  const s=document.getElementById('aspectoSelect');
-  const idx=s.value;
-  if(idx===''||!eventoSeleccionado)return;
-  const p=eventoSeleccionado.plantillaAspectos[parseInt(idx)];
-  const div=document.createElement('div');div.className='item-card';
-  div.innerHTML=`<div class="item-card-header"><span>📌 ${p.titulo}</span><button class="btn btn-danger" onclick="this.closest('.item-card').remove()">✕</button></div><div class="hint" style="margin-bottom:8px;">💡 ${p.titulo}</div><textarea style="width:100%;padding:10px;border:1.5px solid #d8dce8;border-radius:8px;min-height:80px;font-family:inherit;font-size:.9em;" placeholder="${p.placeholder}" class="aspecto-text"></textarea>`;
-  document.getElementById('aspectosContainer').appendChild(div);
-  s.value='';
+function cancelarAspecto(){
+  aspectoEditIndex=null;
+  document.getElementById('aspectoInputText').value='';
+  document.getElementById('aspectoInputBox').classList.add('hidden');
+  document.getElementById('btnAgregarAspecto').classList.remove('hidden');
+}
+
+function guardarAspecto(){
+  const v=document.getElementById('aspectoInputText').value.trim();
+  if(!v)return;
+  if(aspectoEditIndex!==null){
+    aspectosData[aspectoEditIndex]=v;
+  }else{
+    aspectosData.push(v);
+  }
+  renderAspectosList();
+  cancelarAspecto();
+}
+
+function editarAspecto(i){
+  mostrarInputAspecto(i);
+}
+
+function eliminarAspecto(i){
+  if(!confirm('¿Eliminar este aspecto de interés?'))return;
+  aspectosData.splice(i,1);
+  if(aspectoEditIndex===i)cancelarAspecto();
+  renderAspectosList();
+}
+
+function renderAspectosList(){
+  const cont=document.getElementById('aspectosList');
+  cont.innerHTML='';
+  aspectosData.forEach((texto,i)=>{
+    const div=document.createElement('div');div.className='item-card';
+    div.innerHTML=`<div class="item-card-header"><span>📌 Aspecto ${i+1}</span><div style="display:flex;gap:6px;"><button class="btn btn-add" style="padding:4px 10px;font-size:.72em;" onclick="editarAspecto(${i})">✏️ Editar</button><button class="btn btn-danger" onclick="eliminarAspecto(${i})">✕</button></div></div><div style="font-size:.88em;color:var(--texto2);white-space:pre-wrap;"></div><textarea class="aspecto-text hidden"></textarea>`;
+    div.querySelector('div.item-card-header + div').textContent=texto;
+    div.querySelector('.aspecto-text').value=texto;
+    cont.appendChild(div);
+  });
 }
 
 function agregarVictima(){
