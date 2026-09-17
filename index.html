@@ -3,12 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#0f2027">
+
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Generador de PIN">
+
 <title>Generador de PIN — MEBUC</title>
+
 <style>
 :root {
   --azul:#1a3a6e;--azul2:#243f7a;--azul3:#1565c0;
@@ -742,46 +747,157 @@ function generarContraServicioPolicia(d){
 // ── Acciones ──
 function copiarPIN(){
   const texto=document.getElementById('output').textContent;
-  if(!texto||texto==='El PIN generado aparecerá aquí...'){alert('⚠️ Primero genera el PIN.');return;}
-  navigator.clipboard.writeText(texto).then(()=>mostrarToast('✅ Copiado al portapapeles')).catch(()=>{
-    const r=document.createRange();r.selectNode(document.getElementById('output'));
-    window.getSelection().removeAllRanges();window.getSelection().addRange(r);
-    document.execCommand('copy');window.getSelection().removeAllRanges();
+  if(!texto||texto==='El PIN generado aparecerá aquí...'){
+    alert('⚠️ Primero genera el PIN.');
+    return;
+  }
+
+  navigator.clipboard.writeText(texto).then(()=>{
+    mostrarToast('✅ Copiado al portapapeles');
+  }).catch(()=>{
+    const r=document.createRange();
+    r.selectNode(document.getElementById('output'));
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(r);
+    document.execCommand('copy');
+    window.getSelection().removeAllRanges();
     mostrarToast('✅ Copiado al portapapeles');
   });
 }
+
 function compartirWhatsApp(){
   const texto=document.getElementById('output').textContent;
-  if(!texto||texto==='El PIN generado aparecerá aquí...'){alert('⚠️ Primero genera el PIN.');return;}
+  if(!texto||texto==='El PIN generado aparecerá aquí...'){
+    alert('⚠️ Primero genera el PIN.');
+    return;
+  }
+
   window.open('https://wa.me/?text='+encodeURIComponent(texto),'_blank');
   mostrarToast('📱 Abriendo WhatsApp...');
 }
-function mostrarToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
-function nuevo(){if(confirm('¿Seguro que deseas limpiar todo el formulario?'))location.reload();}
 
+function mostrarToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+function nuevo(){
+  if(confirm('¿Seguro que deseas limpiar todo el formulario?'))
+    location.reload();
+}
+
+
+// ── Cargar fecha y hora ──
 window.addEventListener('load',()=>{
   const hoy=new Date();
-  const y=hoy.getFullYear(),m=String(hoy.getMonth()+1).padStart(2,'0'),dd=String(hoy.getDate()).padStart(2,'0');
+
+  const y=hoy.getFullYear();
+  const m=String(hoy.getMonth()+1).padStart(2,'0');
+  const dd=String(hoy.getDate()).padStart(2,'0');
+
   document.getElementById('fecha').value=y+'-'+m+'-'+dd;
-  const h=String(hoy.getHours()).padStart(2,'0'),mi=String(hoy.getMinutes()).padStart(2,'0');
+
+  const h=String(hoy.getHours()).padStart(2,'0');
+  const mi=String(hoy.getMinutes()).padStart(2,'0');
+
   document.getElementById('hora').value=h+':'+mi;
+
+
+  // ── Aviso de instalación en iPhone/iPad ──
   const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent)&&!window.MSStream;
-  const isStandalone=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone;
-  if(isIOS&&!isStandalone&&!localStorage.getItem('ios_hint_dismissed'))
-    setTimeout(()=>{document.getElementById('ios-hint').style.display='block';},2500);
+
+  const isStandalone=
+    window.matchMedia('(display-mode: standalone)').matches ||
+    navigator.standalone;
+
+  if(isIOS&&!isStandalone&&!localStorage.getItem('ios_hint_dismissed')){
+    setTimeout(()=>{
+      const hint=document.getElementById('ios-hint');
+      if(hint) hint.style.display='block';
+    },2500);
+  }
 });
 
+
+// ── Service Worker / PWA ──
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('/sw.js')
+      .then(()=>{
+        console.log('✅ Service Worker registrado');
+      })
+      .catch(error=>{
+        console.log('❌ Error registrando Service Worker:',error);
+      });
+  });
+}
+
+
+// ── Instalación de la aplicación ──
 var deferredPrompt=null;
+
 window.addEventListener('beforeinstallprompt',function(e){
-  e.preventDefault();deferredPrompt=e;
-  const standalone=window.matchMedia('(display-mode: standalone)').matches;
-  if(!standalone&&!localStorage.getItem('banner_dismissed'))
-    setTimeout(()=>{document.getElementById('install-banner').style.display='block';},1800);
+  e.preventDefault();
+  deferredPrompt=e;
+
+  const standalone=
+    window.matchMedia('(display-mode: standalone)').matches;
+
+  if(!standalone&&!localStorage.getItem('banner_dismissed')){
+    setTimeout(()=>{
+      const banner=document.getElementById('install-banner');
+      if(banner) banner.style.display='block';
+    },1800);
+  }
 });
-window.addEventListener('appinstalled',function(){document.getElementById('install-banner').style.display='none';mostrarToast('✅ Aplicación instalada');});
-function instalarApp(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(r=>{document.getElementById('install-banner').style.display='none';deferredPrompt=null;if(r.outcome==='accepted')mostrarToast('✅ Instalando...');});}}
-function cerrarBanner(){document.getElementById('install-banner').style.display='none';localStorage.setItem('banner_dismissed','1');}
-function cerrarIosHint(){document.getElementById('ios-hint').style.display='none';localStorage.setItem('ios_hint_dismissed','1');}
+
+
+// ── Aplicación instalada ──
+window.addEventListener('appinstalled',function(){
+  const banner=document.getElementById('install-banner');
+  if(banner) banner.style.display='none';
+
+  mostrarToast('✅ Aplicación instalada');
+});
+
+
+// ── Botón instalar ──
+function instalarApp(){
+  if(!deferredPrompt) return;
+
+  deferredPrompt.prompt();
+
+  deferredPrompt.userChoice.then(r=>{
+    const banner=document.getElementById('install-banner');
+    if(banner) banner.style.display='none';
+
+    deferredPrompt=null;
+
+    if(r.outcome==='accepted'){
+      mostrarToast('✅ Instalando...');
+    }
+  });
+}
+
+
+// ── Cerrar banner de instalación ──
+function cerrarBanner(){
+  const banner=document.getElementById('install-banner');
+  if(banner) banner.style.display='none';
+
+  localStorage.setItem('banner_dismissed','1');
+}
+
+
+// ── Cerrar aviso de iOS ──
+function cerrarIosHint(){
+  const hint=document.getElementById('ios-hint');
+  if(hint) hint.style.display='none';
+
+  localStorage.setItem('ios_hint_dismissed','1');
+}
 </script>
 </body>
 </html>
