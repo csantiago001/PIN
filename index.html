@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<link rel="manifest" href="/manifest.json">
+<link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0f2027">
 
 <meta name="mobile-web-app-capable" content="yes">
@@ -821,20 +821,6 @@ window.addEventListener('load',()=>{
 });
 
 
-// ── Service Worker / PWA ──
-if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('/sw.js')
-      .then(()=>{
-        console.log('✅ Service Worker registrado');
-      })
-      .catch(error=>{
-        console.log('❌ Error registrando Service Worker:',error);
-      });
-  });
-}
-
-
 // ── Instalación de la aplicación ──
 var deferredPrompt=null;
 
@@ -898,6 +884,14 @@ function cerrarIosHint(){
 
   localStorage.setItem('ios_hint_dismissed','1');
 }
+</script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/PIN/sw.js')
+      .then(r => console.log('SW registrado:', r.scope))
+      .catch(e => console.error('SW falló:', e));
+  }
 </script>
 </body>
 </html>
