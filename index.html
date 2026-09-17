@@ -891,6 +891,17 @@ function cerrarIosHint(){
     navigator.serviceWorker.register('/PIN/sw.js')
       .then(r => console.log('SW registrado:', r.scope))
       .catch(e => console.error('SW falló:', e));
+
+    // Aviso cuando el Service Worker detecta una nueva versión
+    navigator.serviceWorker.addEventListener('message', evt => {
+      if (evt.data && evt.data.type === 'NEW_VERSION') {
+        const banner = document.createElement('div');
+        banner.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:3000;background:linear-gradient(135deg,#0f2027,#1a3a6e);border-top:3px solid #f9a825;padding:14px 18px;text-align:center;box-shadow:0 -4px 24px rgba(0,0,0,.5);font-family:inherit;';
+        banner.innerHTML = '<p style="color:#e0eaf5;margin-bottom:10px;font-size:13px;">🔄 Hay una nueva versión disponible</p><button style="background:#f9a825;color:#0f2027;border:none;padding:10px 22px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;">Actualizar ahora</button>';
+        banner.querySelector('button').onclick = () => location.reload();
+        document.body.appendChild(banner);
+      }
+    });
   }
 </script>
 </body>
